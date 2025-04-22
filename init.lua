@@ -98,6 +98,13 @@ vim.g.have_nerd_font = true
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
+-- Tabbing options
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+
+-- Visually indicate 81st column
+vim.o.colorcolumn = '81'
+
 -- Make line numbers default
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
@@ -239,7 +246,9 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+
+  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  -- ↑ disabling for now, since I want singular consistent tabbing
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -646,6 +655,15 @@ require('lazy').setup({
           end,
         },
       }
+      ---- Enable showing virtual lines rather just the error in the gutter
+      --vim.diagnostic.config {
+      --  virtual_text = false, -- turn off inline text
+      --  virtual_lines = {
+      --    only_current_line = false, -- show under all lines with diagnostics
+      --  },
+      --  signs = true,
+      --  underline = true,
+      --}
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
@@ -665,17 +683,20 @@ require('lazy').setup({
       local servers = {
         clojure_lsp = {},
         -- clangd = {},
-        -- gopls = {},
+        golangci_lint_ls = {},
+        gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
+        html = {},
+        cssls = {},
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-        --
+        ts_ls = {},
+        sqlls = {},
 
         lua_ls = {
           -- cmd = { ... },
@@ -983,7 +1004,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
