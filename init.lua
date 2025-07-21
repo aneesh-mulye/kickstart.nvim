@@ -698,6 +698,8 @@ require('lazy').setup({
         ts_ls = {},
         sqlls = {},
 
+        taplo = {},
+
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
