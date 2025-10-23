@@ -6,7 +6,7 @@ return {
   -- Conjure
   {
     'Olical/conjure',
-    ft = { 'clojure', 'fennel' }, -- etc
+    ft = { 'clojure', 'fennel', 'python' }, -- etc
     lazy = true,
     init = function()
       -- Set configuration options here
@@ -15,4 +15,14 @@ return {
       -- vim.g['conjure#debug'] = true
     end,
   },
+  -- blink.cmp compatibility layer for nvim-cmp sources
+  {
+    'Saghen/blink.compat', -- lets Blink use nvim‑cmp sources
+    version = '2.*', -- v2.x is for Blink v1.x
+    lazy = true,
+    opts = {}, -- mandatory so Lazy calls setup()
+  },
+  -- conjure completion source for nvim-cmp, to be used through above compat
+  -- layer
+  { 'PaterJason/cmp-conjure', lazy = true },
 }
