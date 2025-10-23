@@ -651,7 +651,9 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       ---@type table<string, vim.lsp.Config>
       local servers = {
-        clojure_lsp = {},
+        clojure_lsp = {
+          capabilities = capabilities,
+        },
         -- clangd = {},
         golangci_lint_ls = {},
         gopls = {},
@@ -769,7 +771,7 @@ require('lazy').setup({
   },
 
   { -- Autocompletion
-    'saghen/blink.cmp',
+    'Saghen/blink.cmp',
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
@@ -797,6 +799,9 @@ require('lazy').setup({
         },
         opts = {},
       },
+      'folke/lazydev.nvim',
+      'Saghen/blink.compat',
+      'PaterJason/cmp-conjure',
     },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -838,11 +843,26 @@ require('lazy').setup({
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        -- enable Conjure only for Clojure(Script), Fennel, and Python
+        per_filetype = {
+          clojure = { inherit_defaults = true, 'conjure' },
+          fennel = { inherit_defaults = true, 'conjure' },
+          python = { inherit_defaults = true, 'conjure' },
+        },
+        providers = {
+          lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+          -- wire in Conjure as a source through the compatability layer
+          conjure = {
+            name = 'conjure',
+            module = 'blink.compat.source',
+            async = true,
+          },
+        },
       },
 
       snippets = { preset = 'luasnip' },
