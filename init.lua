@@ -688,6 +688,16 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
+        ocamllsp = {
+          -- Force Neovim to use the binary from your active environment (opam),
+          -- NOT the one Mason downloaded.
+          cmd = { 'dune', 'exec', 'ocamllsp' },
+
+          settings = {
+            codelens = { enable = true },
+            inlayHints = { enable = true },
+          },
+        },
         clojure_lsp = {
           capabilities = capabilities,
         },
