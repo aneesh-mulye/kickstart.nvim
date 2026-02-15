@@ -651,6 +651,16 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       ---@type table<string, vim.lsp.Config>
       local servers = {
+        ocamllsp = {
+          -- Force Neovim to use the binary from your active environment (opam),
+          -- NOT the one Mason downloaded.
+          cmd = { 'dune', 'exec', 'ocamllsp' },
+
+          settings = {
+            codelens = { enable = true },
+            inlayHints = { enable = true },
+          },
+        },
         clojure_lsp = {
           capabilities = capabilities,
         },
