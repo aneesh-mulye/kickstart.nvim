@@ -13,6 +13,9 @@ return {
       -- Uncomment this to get verbose logging to help diagnose internal Conjure issues
       -- This is VERY helpful when reporting an issue with the project
       -- vim.g['conjure#debug'] = true
+      -- Hard-disable Rust client no matter what
+      vim.g['conjure#filetype#rust'] = false
+      vim.g['conjure#mapping#doc_word'] = '<localleader>k'
     end,
   },
   -- blink.cmp compatibility layer for nvim-cmp sources
