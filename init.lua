@@ -665,7 +665,8 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
-        sqlls = {},
+        -- Skipping SQL LSP for now, not really required.
+        -- sqlls = {},
 
         taplo = {},
 
@@ -766,6 +767,7 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        sql = { 'sleek' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
