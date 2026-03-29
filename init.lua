@@ -677,7 +677,8 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
-        sqlls = {},
+        -- Skipping SQL LSP for now, not really required.
+        -- sqlls = {},
 
         stylua = {}, -- Used to format Lua code
 
@@ -770,6 +771,8 @@ require('lazy').setup({
       },
       -- You can also specify external formatters in here.
       formatters_by_ft = {
+        lua = { 'stylua' },
+        sql = { 'sleek' },
         -- rust = { 'rustfmt' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
