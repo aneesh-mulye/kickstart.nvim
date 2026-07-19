@@ -93,6 +93,11 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- Disable remote-plugin providers that aren't used (silences :checkhealth warnings)
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -716,6 +721,7 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         -- You can add other tools here that you want Mason to install
         'stylua', -- Used to format Lua code (a conform formatter, not an LSP server)
+        'codelldb', -- Debug adapter for Rust (used by rustaceanvim)
       })
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
