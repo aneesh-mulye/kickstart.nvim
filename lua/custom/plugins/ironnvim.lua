@@ -1,5 +1,13 @@
 return {
   'Vigemus/iron.nvim',
+  cmd = { 'IronRepl', 'IronRestart', 'IronFocus', 'IronHide' },
+  -- NOTE: keep these off the `<leader>s*` prefix — Telescope loads at VimEnter (after
+  -- startup plugins) and silently shadows anything bound there.
+  keys = {
+    { '<leader>ic', mode = { 'n', 'v' }, desc = 'Iron: send motion/selection to REPL' },
+    { '<leader>if', desc = 'Iron: send [F]ile to REPL' },
+    { '<leader>il', desc = 'Iron: send [L]ine to REPL' },
+  },
   config = function()
     local iron = require 'iron.core'
     local common = require 'iron.fts.common'
@@ -20,9 +28,7 @@ return {
 
               -- 2. Check if it ends with ;; (ignoring whitespace)
               --    The regex ';;%s*$' means ";;" followed by any amount of spaces at the end
-              if not last_line:match ';;%s*$' then
-                lines[#lines] = last_line .. ';;'
-              end
+              if not last_line:match ';;%s*$' then lines[#lines] = last_line .. ';;' end
 
               -- 3. Return the wrapped text
               return common.bracketed_paste(lines)
@@ -33,10 +39,10 @@ return {
 
       -- Keybindings
       keymaps = {
-        send_motion = '<leader>sc',
-        visual_send = '<leader>sc',
-        send_file = '<leader>sf',
-        send_line = '<leader>sl',
+        send_motion = '<leader>ic',
+        visual_send = '<leader>ic',
+        send_file = '<leader>if',
+        send_line = '<leader>il',
       },
     }
   end,

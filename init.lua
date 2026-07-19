@@ -184,10 +184,30 @@ vim.diagnostic.config {
   update_in_insert = false,
   severity_sort = true,
   float = { border = 'rounded', source = 'if_many' },
-  underline = { severity = { min = vim.diagnostic.severity.WARN } },
+  underline = { severity = vim.diagnostic.severity.ERROR },
+  signs = vim.g.have_nerd_font and {
+    text = {
+      [vim.diagnostic.severity.ERROR] = '󰅚 ',
+      [vim.diagnostic.severity.WARN] = '󰀪 ',
+      [vim.diagnostic.severity.INFO] = '󰋽 ',
+      [vim.diagnostic.severity.HINT] = '󰌶 ',
+    },
+  } or {},
 
   -- Can switch between these as you prefer
-  virtual_text = true, -- Text shows up at the end of the line
+  virtual_text = { -- Text shows up at the end of the line
+    source = 'if_many',
+    spacing = 2,
+    format = function(diagnostic)
+      local diagnostic_message = {
+        [vim.diagnostic.severity.ERROR] = diagnostic.message,
+        [vim.diagnostic.severity.WARN] = diagnostic.message,
+        [vim.diagnostic.severity.INFO] = diagnostic.message,
+        [vim.diagnostic.severity.HINT] = diagnostic.message,
+      }
+      return diagnostic_message[diagnostic.severity]
+    end,
+  },
   virtual_lines = false, -- Text shows up underneath the line, with virtual lines
 
   -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
@@ -333,7 +353,7 @@ require('lazy').setup({
       spec = {
         { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
+        { '<leader>i', group = '[I]ron REPL', mode = { 'n', 'v' } },
         { 'gr', group = 'LSP Actions', mode = { 'n' } },
       },
     },
@@ -610,49 +630,11 @@ require('lazy').setup({
         end,
       })
 
-      -- Diagnostic Config
-      -- See :help vim.diagnostic.Opts
-      vim.diagnostic.config {
-        severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
-        signs = vim.g.have_nerd_font and {
-          text = {
-            [vim.diagnostic.severity.ERROR] = '󰅚 ',
-            [vim.diagnostic.severity.WARN] = '󰀪 ',
-            [vim.diagnostic.severity.INFO] = '󰋽 ',
-            [vim.diagnostic.severity.HINT] = '󰌶 ',
-          },
-        } or {},
-        virtual_text = {
-          source = 'if_many',
-          spacing = 2,
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-          end,
-        },
-      }
-      ---- Enable showing virtual lines rather just the error in the gutter
-      --vim.diagnostic.config {
-      --  virtual_text = false, -- turn off inline text
-      --  virtual_lines = {
-      --    only_current_line = false, -- show under all lines with diagnostics
-      --  },
-      --  signs = true,
-      --  underline = true,
-      --}
-
-      -- LSP servers and clients are able to communicate to each other what features they support.
-      --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
-      local capabilities = require('blink.cmp').get_lsp_capabilities()
+      -- NOTE: Diagnostics are configured once, near the top of this file (see the
+      -- `vim.diagnostic.config` call under [[ Basic Keymaps ]]).
+      --
+      -- NOTE: blink.cmp automatically merges its completion capabilities into every
+      -- server via `vim.lsp.config('*', ...)`, so nothing needs to be done here.
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -669,9 +651,7 @@ require('lazy').setup({
             inlayHints = { enable = true },
           },
         },
-        clojure_lsp = {
-          capabilities = capabilities,
-        },
+        clojure_lsp = {},
         -- clangd = {},
         golangci_lint_ls = {},
         gopls = {},
@@ -687,8 +667,6 @@ require('lazy').setup({
         ts_ls = {},
         -- Skipping SQL LSP for now, not really required.
         -- sqlls = {},
-
-        stylua = {}, -- Used to format Lua code
 
         -- Special Lua Config, as recommended by neovim help docs
         lua_ls = {
@@ -733,8 +711,11 @@ require('lazy').setup({
       --
       -- You can press `g?` for help in this menu.
       local ensure_installed = vim.tbl_keys(servers or {})
+      -- ocamllsp comes from the opam environment via `dune exec`, so Mason's copy would never be used
+      ensure_installed = vim.tbl_filter(function(name) return name ~= 'ocamllsp' end, ensure_installed)
       vim.list_extend(ensure_installed, {
         -- You can add other tools here that you want Mason to install
+        'stylua', -- Used to format Lua code (a conform formatter, not an LSP server)
       })
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -821,8 +802,9 @@ require('lazy').setup({
         opts = {},
       },
       'folke/lazydev.nvim',
-      'Saghen/blink.compat',
-      'PaterJason/cmp-conjure',
+      -- blink.compat and cmp-conjure (for the 'conjure' source below) are declared
+      -- in lua/custom/plugins/conjure.lua and load on demand via lazy.nvim's
+      -- module-require hook when a Conjure filetype activates the source.
     },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -1007,11 +989,12 @@ require('lazy').setup({
         local has_indent_query = vim.treesitter.query.get(language, 'indents') ~= nil
 
         -- enables treesitter based indentation
-        if has_indent_query then vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
+        if has_indent_query then vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
       end
 
       local available_parsers = require('nvim-treesitter').get_available()
       vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('kickstart-treesitter-attach', { clear = true }),
         callback = function(args)
           local buf, filetype = args.buf, args.match
 
@@ -1025,7 +1008,10 @@ require('lazy').setup({
             treesitter_try_attach(buf, language)
           elseif vim.tbl_contains(available_parsers, language) then
             -- if a parser is available in `nvim-treesitter` auto install it, and enable it after the installation is done
-            require('nvim-treesitter').install(language):await(function() treesitter_try_attach(buf, language) end)
+            -- (the buffer may have been closed by the time the install finishes)
+            require('nvim-treesitter').install(language):await(function()
+              if vim.api.nvim_buf_is_valid(buf) then treesitter_try_attach(buf, language) end
+            end)
           else
             -- try to enable treesitter features in case the parser exists but is not available from `nvim-treesitter`
             treesitter_try_attach(buf, language)

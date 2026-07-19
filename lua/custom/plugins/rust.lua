@@ -9,11 +9,11 @@ return {
           default_settings = {
             ['rust-analyzer'] = {
               -- Run cargo diagnostics on save (default is true)
-              checkOnSave = true, -- :contentReference[oaicite:3]{index=3}
+              checkOnSave = true,
 
               -- Use clippy instead of cargo check
               check = {
-                command = 'clippy', -- :contentReference[oaicite:4]{index=4}
+                command = 'clippy',
               },
 
               -- Usually worth having on for real-world crates

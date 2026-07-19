@@ -8,8 +8,8 @@ A personal Neovim configuration based on kickstart.nvim, managed with lazy.nvim.
 
 ## Commands
 
-- Format Lua: `stylua .` (config in `.stylua.toml`: 160-column width, single quotes, `call_parentheses = "None"`, `collapse_simple_statement = "Always"` — match this style when writing Lua)
-- Check formatting: `stylua --check .`
+- Format Lua: `stylua .` — stylua is Mason-installed and not on PATH; use `~/.local/share/nvim/mason/bin/stylua`. (Config in `.stylua.toml`: 160-column width, single quotes, `call_parentheses = "None"`, `collapse_simple_statement = "Always"` — match this style when writing Lua)
+- Check formatting: `~/.local/share/nvim/mason/bin/stylua --check .`
 - Verify the config loads without errors: `nvim --headless "+qa"` (startup errors print to stderr)
 - Plugin management happens inside Neovim: `:Lazy` (status), `:Lazy update`; `:Mason` for LSP/tool installs; `:checkhealth` for diagnostics. `lazy-lock.json` pins plugin versions.
 
